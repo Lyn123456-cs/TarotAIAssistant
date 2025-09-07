@@ -1,0 +1,9 @@
+# 忽略敏感信息
+*.log
+.DS_Store
+node_modules/
+.env
+*.env
+
+# 保留API密钥文件用于部署
+# ai-tarot-service.js

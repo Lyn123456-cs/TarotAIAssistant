@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI塔罗牌助手</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🔮 AI塔罗牌助手</h1>
+            <p class="subtitle">让神秘的塔罗牌为你指引方向</p>
+        </header>
+
+        <main class="main-content">
+            <div class="question-section" id="questionSection">
+                <div class="card">
+                    <h2>请告诉我你想要占卜的问题</h2>
+                    <p class="instruction">塔罗牌可以帮助你探索内心，获得指引。请诚实地提出你的问题，无论是关于爱情、事业、健康还是其他人生课题。</p>
+                    
+                    <div class="question-input">
+                        <textarea 
+                            id="userQuestion" 
+                            placeholder="例如：我最近的感情发展会如何？我的事业方向是否正确？我应该如何面对当前的挑战？"
+                            rows="4"
+                        ></textarea>
+                    </div>
+
+                    <div class="question-categories">
+                        <h3>常见问题类型：</h3>
+                        <div class="category-buttons">
+                            <button class="category-btn" data-category="love">💕 感情</button>
+                            <button class="category-btn" data-category="career">💼 事业</button>
+                            <button class="category-btn" data-category="health">🌿 健康</button>
+                            <button class="category-btn" data-category="finance">💰 财运</button>
+                            <button class="category-btn" data-category="family">👨‍👩‍👧‍👦 家庭</button>
+                            <button class="category-btn" data-category="study">📚 学业</button>
+                            <button class="category-btn" data-category="friendship">🤝 友情</button>
+                            <button class="category-btn" data-category="travel">✈️ 出行</button>
+                            <button class="category-btn" data-category="decision">🤔 决策</button>
+                            <button class="category-btn" data-category="spiritual">🧘 心灵</button>
+                            <button class="category-btn" data-category="general">🌟 综合</button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="startReading" class="btn-primary" disabled>开始占卜</button>
+                        <button id="clearQuestion" class="btn-secondary">清空问题</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reading-section" id="readingSection" style="display: none;">
+                <div class="card">
+                    <h2>你的问题</h2>
+                    <div class="question-display" id="questionDisplay"></div>
+                    
+        <div class="drawing-method-selection" id="drawingMethodSelection" style="display: none;">
+            <h3>请选择抽牌方式</h3>
+            <div class="method-buttons">
+                <button class="method-btn" data-method="mouse">
+                    <div class="method-icon">🖱️</div>
+                    <div class="method-title">鼠标选择</div>
+                    <div class="method-desc">从78张牌中自由选择</div>
+                </button>
+                <button class="method-btn" data-method="random">
+                    <div class="method-icon">🎲</div>
+                    <div class="method-title">随机抽取</div>
+                    <div class="method-desc">系统自动随机抽取</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- AI配置界面 -->
+        <div class="ai-config-section" id="aiConfigSection" style="display: none;">
+            <h3>🔮 AI专业解牌配置</h3>
+            <div class="ai-config-content">
+                <div class="config-option">
+                    <label for="aiProvider">选择AI服务商：</label>
+                    <select id="aiProvider">
+                        <option value="openai">OpenAI ChatGPT (推荐)</option>
+                        <option value="deepseek">DeepSeek R1</option>
+                    </select>
+                </div>
+                <div class="config-option">
+                    <label for="apiKey">API密钥：</label>
+                    <input type="password" id="apiKey" placeholder="请输入您的API密钥">
+                    <small>密钥将安全存储在本地，不会上传到服务器</small>
+                </div>
+                <div class="config-actions">
+                    <button id="saveApiConfig" class="config-btn">保存配置</button>
+                    <button id="testApiConnection" class="config-btn">测试连接</button>
+                    <button id="skipAiConfig" class="config-btn secondary">跳过AI配置</button>
+                </div>
+                <div class="api-status" id="apiStatus"></div>
+            </div>
+        </div>
+                    
+                    <div class="card-selection-area" id="cardSelectionArea" style="display: none;">
+                        <h3>请选择你要抽取的牌</h3>
+                        <p class="selection-instruction">点击你想要的牌进行抽取</p>
+                        <div class="card-grid" id="cardGrid">
+                            <!-- 塔罗牌选择网格将在这里显示 -->
+                        </div>
+                    </div>
+                    
+                    <div class="tarot-cards" id="tarotCards">
+                        <!-- 选中的塔罗牌将在这里显示 -->
+                    </div>
+                    
+                    <div class="reading-result" id="readingResult">
+                        <!-- 占卜结果将在这里显示 -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="newReading" class="btn-primary">新的占卜</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>✨ 塔罗牌仅供娱乐和参考，请理性对待占卜结果 ✨</p>
+        </footer>
+    </div>
+
+    <script src="ai-tarot-service.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
