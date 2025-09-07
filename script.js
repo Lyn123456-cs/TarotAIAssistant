@@ -1124,10 +1124,14 @@ class TarotAssistant {
         const categoryName = this.getCategoryName(category);
         const spreadName = this.getSpreadName(questionType);
         
+        // 根据问题类型生成针对性的标题和描述
+        const questionFocusedTitle = this.getQuestionFocusedTitle(questionType, categoryName);
+        const questionFocusedDescription = this.getQuestionFocusedDescription(question, questionType, cards.length, spreadName);
+        
         let reading = `
             <div class="reading-header">
-                <h2>🔮 <strong>塔罗牌占卜：${categoryName}分析</strong></h2>
-                <p>我为您抽取了${cards.length}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您解读${categoryName}的能量走向。</p>
+                <h2>🔮 <strong>${questionFocusedTitle}</strong></h2>
+                <p>${questionFocusedDescription}</p>
             </div>
             
             <hr class="reading-divider">
@@ -1158,7 +1162,7 @@ class TarotAssistant {
         });
 
         // 添加整体解读与建议
-        const overallAnalysis = this.getOverallAnalysis(cards, category, questionType);
+        const overallAnalysis = this.getOverallAnalysis(cards, category, questionType, question);
         
         reading += `
             </div>
@@ -1167,6 +1171,9 @@ class TarotAssistant {
             
             <div class="overall-analysis">
                 <h3>### **整体解读与建议**</h3>
+                <div class="direct-answer">
+                    <p><strong>🎯 直接回答</strong>：${overallAnalysis.directAnswer}</p>
+                </div>
                 <div class="energy-trend">
                     <p><strong>能量趋势</strong>：${overallAnalysis.energyTrend}</p>
                 </div>
@@ -1203,6 +1210,38 @@ class TarotAssistant {
             general: '综合解读'
         };
         return spreadNames[questionType] || '综合解读';
+    }
+
+    // 获取针对问题的标题
+    getQuestionFocusedTitle(questionType, categoryName) {
+        const titles = {
+            yesno: `塔罗牌占卜：是非判断分析`,
+            choice: `塔罗牌占卜：选择决策分析`,
+            comparison: `塔罗牌占卜：对比分析`,
+            time: `塔罗牌占卜：时机分析`,
+            reason: `塔罗牌占卜：原因探索分析`,
+            trend: `塔罗牌占卜：趋势发展分析`,
+            advice: `塔罗牌占卜：建议指导分析`,
+            prediction: `塔罗牌占卜：未来预测分析`,
+            general: `塔罗牌占卜：${categoryName}综合分析`
+        };
+        return titles[questionType] || `塔罗牌占卜：${categoryName}分析`;
+    }
+
+    // 获取针对问题的描述
+    getQuestionFocusedDescription(question, questionType, cardCount, spreadName) {
+        const descriptions = {
+            yesno: `针对您的是非问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您提供明确的"是"或"否"的指引。`,
+            choice: `针对您的选择问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您分析各选项的优劣和最佳选择。`,
+            comparison: `针对您的比较问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您进行详细的对比分析。`,
+            time: `针对您的时间问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您揭示最佳时机和关键时间节点。`,
+            reason: `针对您的原因问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您探索问题的根本原因。`,
+            trend: `针对您的趋势问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您分析未来的发展趋势。`,
+            advice: `针对您的建议问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您提供具体的行动指导。`,
+            prediction: `针对您的预测问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您预测未来可能的发展。`,
+            general: `针对您的问题，我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您提供全面的分析和指导。`
+        };
+        return descriptions[questionType] || `我为您抽取了${cardCount}张牌，采用 <strong>「${spreadName}」</strong> 牌阵，为您提供专业的塔罗牌解读。`;
     }
 
     // 获取专业的牌面数据
@@ -1352,8 +1391,11 @@ class TarotAssistant {
     }
 
     // 获取整体分析
-    getOverallAnalysis(cards, category, questionType) {
+    getOverallAnalysis(cards, category, questionType, question) {
         const categoryName = this.getCategoryName(category);
+        
+        // 生成直接回答
+        const directAnswer = this.generateDirectAnswer(cards, category, questionType, question);
         
         // 根据牌的组合生成能量趋势分析
         const energyTrend = this.generateEnergyTrend(cards, category);
@@ -1362,9 +1404,186 @@ class TarotAssistant {
         const keyAdvice = this.generateKeyAdvice(cards, category, questionType);
         
         return {
+            directAnswer: directAnswer,
             energyTrend: energyTrend,
             keyAdvice: keyAdvice
         };
+    }
+
+    // 生成直接回答
+    generateDirectAnswer(cards, category, questionType, question) {
+        const cardNames = cards.map(card => card.name);
+        const categoryName = this.getCategoryName(category);
+        
+        // 根据问题类型生成针对性的直接回答
+        switch (questionType) {
+            case 'yesno':
+                return this.generateYesNoAnswer(cardNames, categoryName);
+            case 'choice':
+                return this.generateChoiceAnswer(cardNames, categoryName);
+            case 'trend':
+                return this.generateTrendAnswer(cardNames, categoryName);
+            case 'prediction':
+                return this.generatePredictionAnswer(cardNames, categoryName);
+            case 'advice':
+                return this.generateAdviceAnswer(cardNames, categoryName);
+            case 'reason':
+                return this.generateReasonAnswer(cardNames, categoryName);
+            case 'time':
+                return this.generateTimeAnswer(cardNames, categoryName);
+            case 'comparison':
+                return this.generateComparisonAnswer(cardNames, categoryName);
+            default:
+                return this.generateGeneralAnswer(cardNames, categoryName);
+        }
+    }
+
+    // 生成是非题答案
+    generateYesNoAnswer(cardNames, categoryName) {
+        const positiveCards = ['太阳', '星星', '月亮', '世界', '审判', '恋人', '圣杯二', '圣杯十'];
+        const negativeCards = ['死神', '塔', '恶魔', '宝剑三', '宝剑九', '宝剑十'];
+        
+        const positiveCount = cardNames.filter(name => positiveCards.includes(name)).length;
+        const negativeCount = cardNames.filter(name => negativeCards.includes(name)).length;
+        
+        if (positiveCount > negativeCount) {
+            return `基于牌面分析，答案倾向于"是"。${categoryName}方面的发展是积极的，建议您保持信心并采取行动。`;
+        } else if (negativeCount > positiveCount) {
+            return `基于牌面分析，答案倾向于"否"。${categoryName}方面需要谨慎考虑，建议您重新评估当前的情况。`;
+        } else {
+            return `牌面显示情况较为复杂，答案不是简单的"是"或"否"。${categoryName}方面需要更多的信息和时间来判断。`;
+        }
+    }
+
+    // 生成选择题答案
+    generateChoiceAnswer(cardNames, categoryName) {
+        const actionCards = ['战车', '权杖一', '权杖三', '权杖八'];
+        const wisdomCards = ['女祭司', '隐者', '教皇', '圣杯一'];
+        const balanceCards = ['正义', '节制', '圣杯二', '星币六'];
+        
+        const actionCount = cardNames.filter(name => actionCards.includes(name)).length;
+        const wisdomCount = cardNames.filter(name => wisdomCards.includes(name)).length;
+        const balanceCount = cardNames.filter(name => balanceCards.includes(name)).length;
+        
+        if (actionCount >= wisdomCount && actionCount >= balanceCount) {
+            return `牌面建议选择更积极、更有行动力的选项。${categoryName}方面需要主动出击，不要犹豫不决。`;
+        } else if (wisdomCount >= actionCount && wisdomCount >= balanceCount) {
+            return `牌面建议选择更谨慎、更有智慧的选项。${categoryName}方面需要深思熟虑，寻求专业建议。`;
+        } else {
+            return `牌面建议选择平衡、稳定的选项。${categoryName}方面需要保持中庸之道，避免极端。`;
+        }
+    }
+
+    // 生成趋势题答案
+    generateTrendAnswer(cardNames, categoryName) {
+        const futureCards = cardNames.filter(name => ['太阳', '星星', '世界', '审判'].includes(name));
+        const challengeCards = cardNames.filter(name => ['死神', '塔', '恶魔', '宝剑十'].includes(name));
+        
+        if (futureCards.length > challengeCards.length) {
+            return `${categoryName}的发展趋势是积极的，未来会朝着更好的方向发展。虽然可能遇到一些挑战，但最终会获得成功。`;
+        } else if (challengeCards.length > futureCards.length) {
+            return `${categoryName}的发展趋势需要谨慎，可能会遇到一些挑战和变化。建议做好准备，积极应对。`;
+        } else {
+            return `${categoryName}的发展趋势是稳定的，会保持当前的状态。建议保持耐心，等待合适的时机。`;
+        }
+    }
+
+    // 生成预测题答案
+    generatePredictionAnswer(cardNames, categoryName) {
+        const positiveCards = ['太阳', '星星', '月亮', '世界', '审判'];
+        const neutralCards = ['隐者', '教皇', '正义', '节制'];
+        const challengingCards = ['死神', '塔', '恶魔', '宝剑三'];
+        
+        const positiveCount = cardNames.filter(name => positiveCards.includes(name)).length;
+        const neutralCount = cardNames.filter(name => neutralCards.includes(name)).length;
+        const challengingCount = cardNames.filter(name => challengingCards.includes(name)).length;
+        
+        if (positiveCount >= 2) {
+            return `预测结果：${categoryName}方面有70-80%的可能性会朝着积极的方向发展，建议保持乐观态度。`;
+        } else if (challengingCount >= 2) {
+            return `预测结果：${categoryName}方面有60-70%的可能性会遇到挑战，建议提前做好准备。`;
+        } else {
+            return `预测结果：${categoryName}方面的发展较为平稳，有50-60%的可能性会保持现状。`;
+        }
+    }
+
+    // 生成建议题答案
+    generateAdviceAnswer(cardNames, categoryName) {
+        const actionCards = ['战车', '权杖一', '权杖三', '权杖八'];
+        const patienceCards = ['隐者', '教皇', '节制', '圣杯一'];
+        
+        const actionCount = cardNames.filter(name => actionCards.includes(name)).length;
+        const patienceCount = cardNames.filter(name => patienceCards.includes(name)).length;
+        
+        if (actionCount > patienceCount) {
+            return `建议：${categoryName}方面需要立即采取行动，不要拖延。现在是行动的最佳时机。`;
+        } else {
+            return `建议：${categoryName}方面需要保持耐心，等待合适的时机。现在更适合观察和准备。`;
+        }
+    }
+
+    // 生成原因题答案
+    generateReasonAnswer(cardNames, categoryName) {
+        const internalCards = ['隐者', '女祭司', '圣杯一', '圣杯二'];
+        const externalCards = ['战车', '权杖一', '权杖三', '宝剑一'];
+        
+        const internalCount = cardNames.filter(name => internalCards.includes(name)).length;
+        const externalCount = cardNames.filter(name => externalCards.includes(name)).length;
+        
+        if (internalCount > externalCount) {
+            return `原因分析：${categoryName}方面的问题主要源于内在因素，如个人态度、情绪或价值观的冲突。`;
+        } else {
+            return `原因分析：${categoryName}方面的问题主要源于外在因素，如环境变化、他人影响或客观条件。`;
+        }
+    }
+
+    // 生成时间题答案
+    generateTimeAnswer(cardNames, categoryName) {
+        const quickCards = ['权杖一', '权杖八', '战车', '太阳'];
+        const slowCards = ['隐者', '教皇', '节制', '圣杯一'];
+        
+        const quickCount = cardNames.filter(name => quickCards.includes(name)).length;
+        const slowCount = cardNames.filter(name => slowCards.includes(name)).length;
+        
+        if (quickCount > slowCount) {
+            return `时机分析：${categoryName}方面的变化会在短期内发生，建议在1-3个月内做好准备。`;
+        } else {
+            return `时机分析：${categoryName}方面的变化需要较长时间，建议在3-6个月内持续关注。`;
+        }
+    }
+
+    // 生成比较题答案
+    generateComparisonAnswer(cardNames, categoryName) {
+        const firstOptionCards = ['权杖一', '权杖三', '权杖八', '战车'];
+        const secondOptionCards = ['圣杯一', '圣杯二', '圣杯三', '圣杯十'];
+        
+        const firstCount = cardNames.filter(name => firstOptionCards.includes(name)).length;
+        const secondCount = cardNames.filter(name => secondOptionCards.includes(name)).length;
+        
+        if (firstCount > secondCount) {
+            return `比较结果：第一个选项更适合您，${categoryName}方面会带来更多的行动力和成功机会。`;
+        } else if (secondCount > firstCount) {
+            return `比较结果：第二个选项更适合您，${categoryName}方面会带来更多的情感满足和和谐。`;
+        } else {
+            return `比较结果：两个选项各有优势，${categoryName}方面需要根据您的具体需求来选择。`;
+        }
+    }
+
+    // 生成综合题答案
+    generateGeneralAnswer(cardNames, categoryName) {
+        const positiveCards = ['太阳', '星星', '月亮', '世界', '审判'];
+        const challengingCards = ['死神', '塔', '恶魔', '宝剑三'];
+        
+        const positiveCount = cardNames.filter(name => positiveCards.includes(name)).length;
+        const challengingCount = cardNames.filter(name => challengingCards.includes(name)).length;
+        
+        if (positiveCount > challengingCount) {
+            return `综合分析：${categoryName}方面整体发展良好，建议保持积极态度，继续努力。`;
+        } else if (challengingCount > positiveCount) {
+            return `综合分析：${categoryName}方面需要谨慎应对，建议做好充分准备，积极面对挑战。`;
+        } else {
+            return `综合分析：${categoryName}方面发展平稳，建议保持现状，等待更好的时机。`;
+        }
     }
 
     // 生成能量趋势分析
